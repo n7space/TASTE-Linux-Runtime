@@ -1,25 +1,36 @@
 #ifndef TASTE_REQUEST_H
 #define TASTE_REQUEST_H
 
-#include <cstddef>
+#include <cstdint>
+#include <cstring>
 
-#include <request_size.h>
+namespace taste {
+template <size_t PARAMETER_SIZE> struct Request final {
+  Request() : m_length(0) {}
 
-namespace taste
-{
-	struct Request final
-	{
-		uint32_t m_length;
-		uint8_t m_data[GENERIC_LINUX_BUFFER_SIZE];
+  Request(const Request &other) : m_length(other.m_length) {
+    memcpy(m_data, other.m_data, PARAMETER_SIZE);
+  }
 
-		Request();
+  Request(Request &&other) : m_length(other.m_length) {
+    memcpy(m_data, other.m_data, PARAMETER_SIZE);
+  }
 
-		Request(const Request& other);
-		Request(Request&& other);
+  Request &operator=(const Request &rhs) {
+    m_length = rhs.m_length;
+    memcpy(m_data, rhs.m_data, PARAMETER_SIZE);
+    return *this;
+  }
 
-		Request& operator=(const Request& rhs);
-		Request& operator=(Request&& rhs);
-	};
-}
+  Request &operator=(Request &&rhs) {
+    m_length = rhs.m_length;
+    memcpy(m_data, rhs.m_data, PARAMETER_SIZE);
+    return *this;
+  }
+
+  uint32_t m_length;
+  uint8_t m_data[PARAMETER_SIZE];
+};
+} // namespace taste
 
 #endif

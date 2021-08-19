@@ -3,26 +3,23 @@
 
 #include <mutex>
 
-namespace taste
-{
-	class Lock final
-	{
-	public:
-		Lock();
-		~Lock();
-		Lock(const Lock&) = delete;
-		Lock(Lock&&) = delete;
+namespace taste {
+class Lock final {
+public:
+  Lock();
+  ~Lock();
+  Lock(const Lock &) = delete;
+  Lock(Lock &&) = delete;
 
-		Lock& operator=(const Lock&) = delete;
-		Lock& operator=(Lock&&) = delete;
+  Lock &operator=(const Lock &) = delete;
+  Lock &operator=(Lock &&) = delete;
 
-		void lock();
-		void unlock();
+  void lock();
+  void unlock();
 
-	private:
-		std::mutex m_mutex;
-
-	};
-}
+private:
+  std::mutex m_mutex;
+};
+} // namespace taste
 
 #endif
