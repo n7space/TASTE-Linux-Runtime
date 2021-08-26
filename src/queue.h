@@ -38,6 +38,25 @@ public:
     }
   }
 
+  void put(const uint8_t *data, size_t length) {
+    m_mutex.lock();
+    static Request<PARAMETER_SIZE> request;
+    memcpy(request.m_data, data, length);
+    request.m_length = length;
+
+    if (m_queue.size() > m_max_elements) {
+      std::cerr << "Message loss - queue is full, " << m_max_elements
+                << " allowed" << std::endl;
+      m_mutex.unlock();
+
+    } else {
+      m_queue.push(request);
+      m_mutex.unlock();
+      m_cv.notify_one();
+      sched_yield();
+    }
+  }
+
   void get(Request<PARAMETER_SIZE> &request) {
     std::unique_lock<std::mutex> lock(m_mutex);
     while (true) {
@@ -52,7 +71,7 @@ public:
     }
   }
 
-  bool empty() const {
+  bool is_empty() const {
     std::unique_lock<std::mutex> lock(m_mutex);
     return m_queue.empty();
   }

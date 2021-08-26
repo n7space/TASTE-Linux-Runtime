@@ -4,6 +4,22 @@
 
 namespace taste {
 void Thread::start(void (*method)()) {
+  m_method = nullptr;
+  m_param = nullptr;
+  create_thread(&Thread::method_wrapper, reinterpret_cast<void *>(method));
+}
+
+void Thread::start(void (*method)(void *), void *param) {
+  m_method = method;
+  m_param = param;
+  create_thread(&Thread::method_wrapper_with_parameter,
+                reinterpret_cast<void *>(this));
+}
+
+Thread::Thread(int priority, size_t stack_size)
+    : m_priority(priority), m_stack_size(stack_size) {}
+
+void Thread::create_thread(void *(*fn)(void *), void *param) {
   pthread_attr_t thread_attributes;
 
   int res = pthread_attr_init(&thread_attributes);
@@ -42,9 +58,7 @@ void Thread::start(void (*method)()) {
     return;
   }
 
-  res =
-      pthread_create(&m_thread_id, &thread_attributes, &Thread::method_wrapper,
-                     reinterpret_cast<void *>(method));
+  res = pthread_create(&m_thread_id, &thread_attributes, fn, param);
   if (res != 0) {
     std::cerr << "Unable to create thread" << std::endl;
   }
@@ -52,13 +66,20 @@ void Thread::start(void (*method)()) {
   pthread_attr_destroy(&thread_attributes);
 }
 
-Thread::Thread(int priority, size_t stack_size)
-    : m_priority(priority), m_stack_size(stack_size) {}
-
 void *Thread::method_wrapper(void *param) {
   void (*method)() = reinterpret_cast<void (*)()>(param);
   method();
 
   return nullptr;
 }
+
+void *Thread::method_wrapper_with_parameter(void *param) {
+  Thread *self = reinterpret_cast<Thread *>(param);
+
+  void (*method)(void *) = self->m_method;
+  method(self->m_param);
+
+  return nullptr;
+}
+
 } // namespace taste
