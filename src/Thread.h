@@ -23,19 +23,45 @@
 #ifndef TASTE_THREAD_H
 #define TASTE_THREAD_H
 
+/**
+ * @file    Thread.h
+ * @brief   Thread implementation for TASTE
+ */
+
 #include <cstddef>
 #include <pthread.h>
 
 namespace taste {
+/**
+ * @brief Thread implementation for TASTE
+ */
 class Thread final {
 public:
+  /**
+   * @brief Create a thread, without starting it
+   *
+   * @param priority     Priority of thread
+   * @param stack_size   Stack size for new thread in bytes
+   */
   Thread(int priority, size_t stack_size);
   Thread(const Thread &) = delete;
   Thread(Thread &&) = delete;
   Thread &operator=(const Thread &) = delete;
   Thread &operator=(Thread &&) = delete;
 
+  /**
+   * @brief Starts a thread
+   *
+   * @param method  A function which will be executed inside new thread.
+   */
   void start(void (*method)());
+
+  /**
+   * @brief Starts a thread with parameter
+   *
+   * @param method  A function which will be executed inside new thread.
+   * @param param   A parameter for function.
+   */
   void start(void (*method)(void *), void *param);
 
 private:

@@ -23,8 +23,18 @@
 #ifndef BROKER_LOCK_H
 #define BROKER_LOCK_H
 
+/**
+ * @file    BrockerLock.h
+ * @brief   Headers for lock functions required by Broker.
+ *
+ * Broker is runtime-agnostic, therefore these functions are implemented by
+ * runtime with c-linkage.
+ */
+
 extern "C" {
+/// @brief function used by Broker to acquire the lock.
 void Broker_acquire_lock();
+/// @brief function used by Broker to release the lock.
 void Broker_release_lock();
 }
 

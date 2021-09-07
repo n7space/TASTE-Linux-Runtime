@@ -23,30 +23,47 @@
 #ifndef TASTE_TIMER_H
 #define TASTE_TIMER_H
 
+/**
+ * @file    Timer.h
+ * @brief   Timer for cyclic interfaces in TASTE
+ */
+
 #include <chrono>
 #include <thread>
 
 namespace taste {
+/**
+ * @brief Times is used to implement cyclic interfaces in TASTE
+ */
 class Timer final {
 public:
-  Timer() = default;
-
+  /**
+   * @brief Execute given operation with given interval.
+   *
+   * @tparam T         callback type
+   * @param interval   interval value
+   * @param callback   function like object to execute.
+   */
   template <typename T>
-  void run(std::chrono::milliseconds interval, T callback) {
-    auto start = std::chrono::steady_clock::now();
-    while (true) {
-      using namespace std::chrono_literals;
-      auto jitter = std::chrono::steady_clock::now() - start;
-      auto diff = interval - jitter;
-      if (diff > 0ms) {
-        std::this_thread::sleep_for(diff);
-      }
-      callback();
-
-      start = std::chrono::steady_clock::now();
-    }
-  }
+  void run(std::chrono::milliseconds interval, T callback);
 };
+
+template <typename T>
+void Timer::run(std::chrono::milliseconds interval, T callback) {
+  auto start = std::chrono::steady_clock::now();
+  while (true) {
+    using namespace std::chrono_literals;
+    auto jitter = std::chrono::steady_clock::now() - start;
+    auto diff = interval - jitter;
+    if (diff > 0ms) {
+      std::this_thread::sleep_for(diff);
+    }
+    callback();
+
+    start = std::chrono::steady_clock::now();
+  }
+}
+
 } // namespace taste
 
 #endif

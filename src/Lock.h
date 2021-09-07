@@ -23,20 +23,35 @@
 #ifndef TASTE_LOCK_H
 #define TASTE_LOCK_H
 
+/**
+ * @file     Lock.h
+ * @brief    Implemntation of lock required by TASTE function blocks.
+ *
+ */
+
 #include <mutex>
 
 namespace taste {
+/**
+ * @brief Concurrency Lock implementation
+ */
 class Lock final {
 public:
+  /**
+   * @brief Default constructor.
+   *
+   * Constructed lock is in 'unlocked' state.
+   */
   Lock();
-  ~Lock();
   Lock(const Lock &) = delete;
   Lock(Lock &&) = delete;
 
   Lock &operator=(const Lock &) = delete;
   Lock &operator=(Lock &&) = delete;
 
+  /// @brief acquire lock
   void lock();
+  /// @release lock
   void unlock();
 
 private:

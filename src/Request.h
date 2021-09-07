@@ -23,36 +23,76 @@
 #ifndef TASTE_REQUEST_H
 #define TASTE_REQUEST_H
 
+/**
+ * @file    Request.h
+ * @brief   Request or message in TASTE system.
+ */
+
 #include <cstdint>
 #include <cstring>
 
 namespace taste {
+/**
+ * @brief Request or message used to implement sporadic interfaces in TASTE.
+ *
+ * @tparam PARAMETER_SIZE The maximum size of request in bytes.
+ */
 template <size_t PARAMETER_SIZE> struct Request final {
-  Request() : m_length(0) {}
+  /**
+   * @brief Default constructor
+   *
+   * Constructs Request with length = 0
+   */
+  Request();
 
-  Request(const Request &other) : m_length(other.m_length) {
-    memcpy(m_data, other.m_data, PARAMETER_SIZE);
-  }
+  /// @brief copy constructor
+  Request(const Request &other);
 
-  Request(Request &&other) : m_length(other.m_length) {
-    memcpy(m_data, other.m_data, PARAMETER_SIZE);
-  }
+  /// @brief move constructor
+  Request(Request &&other);
 
-  Request &operator=(const Request &rhs) {
-    m_length = rhs.m_length;
-    memcpy(m_data, rhs.m_data, PARAMETER_SIZE);
-    return *this;
-  }
+  /// @brief copy assignment operator
+  Request &operator=(const Request &rhs);
 
-  Request &operator=(Request &&rhs) {
-    m_length = rhs.m_length;
-    memcpy(m_data, rhs.m_data, PARAMETER_SIZE);
-    return *this;
-  }
+  /// @brief move assignment operator
+  Request &operator=(Request &&rhs);
 
+  /// @brief the length of the request in bytes
   uint32_t m_length;
+
+  /// @brief the buffer with the request data
   uint8_t m_data[PARAMETER_SIZE];
 };
+
+template <size_t PARAMETER_SIZE>
+Request<PARAMETER_SIZE>::Request() : m_length(0) {}
+
+template <size_t PARAMETER_SIZE>
+Request<PARAMETER_SIZE>::Request(const Request &other)
+    : m_length(other.m_length) {
+  memcpy(m_data, other.m_data, PARAMETER_SIZE);
+}
+
+template <size_t PARAMETER_SIZE>
+Request<PARAMETER_SIZE>::Request(Request &&other) : m_length(other.m_length) {
+  memcpy(m_data, other.m_data, PARAMETER_SIZE);
+}
+
+template <size_t PARAMETER_SIZE>
+Request<PARAMETER_SIZE> &Request<PARAMETER_SIZE>::
+operator=(const Request &rhs) {
+  m_length = rhs.m_length;
+  memcpy(m_data, rhs.m_data, PARAMETER_SIZE);
+  return *this;
+}
+
+template <size_t PARAMETER_SIZE>
+Request<PARAMETER_SIZE> &Request<PARAMETER_SIZE>::operator=(Request &&rhs) {
+  m_length = rhs.m_length;
+  memcpy(m_data, rhs.m_data, PARAMETER_SIZE);
+  return *this;
+}
+
 } // namespace taste
 
 #endif
