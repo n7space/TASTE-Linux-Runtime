@@ -44,131 +44,140 @@ namespace taste {
  *
  * @tparam PARAMETER_SIZE The maximum size of single request in bytes.
  */
-template <size_t PARAMETER_SIZE> class Queue final {
-public:
-  /**
-   * @brief Constructor
-   *
-   * @param max_elements    Maximum number of elements
-   */
-  Queue(size_t max_elements);
+template<size_t PARAMETER_SIZE>
+class Queue final {
+  public:
+    /**
+     * @brief Constructor
+     *
+     * @param max_elements    Maximum number of elements
+     */
+    Queue(size_t max_elements);
 
-  Queue(const Queue &) = delete;
-  Queue(Queue &&) = delete;
+    Queue(const Queue&) = delete;
+    Queue(Queue&&) = delete;
 
-  Queue &operator=(const Queue &) = delete;
-  Queue &operator=(Queue &&) = delete;
+    Queue& operator=(const Queue&) = delete;
+    Queue& operator=(Queue&&) = delete;
 
-  /**
-   * @brief Put message into queue
-   *
-   * If queue is full the request will be dropped.
-   * After successfull operation, the waiting thread will be notified.
-   *
-   * @param request  The request which will be inserted into queue
-   */
-  void put(const Request<PARAMETER_SIZE> &request);
+    /**
+     * @brief Put message into queue
+     *
+     * If queue is full the request will be dropped.
+     * After successfull operation, the waiting thread will be notified.
+     *
+     * @param request  The request which will be inserted into queue
+     */
+    void put(const Request<PARAMETER_SIZE>& request);
 
-  /**
-   * @brief Put raw data into queue
-   *
-   * This function creates appropriate Request with given data before
-   * putting it into queue.
-   * If queue is full the request will be dropped.
-   * If length is larger than PARAMETER_SIZE the request will be dropped.
-   * After successfull operation, the waiting thread will be notified.
-   *
-   * @param data    The buffer with the request data
-   * @param length  The length of the request
-   */
-  void put(const uint8_t *data, size_t length);
+    /**
+     * @brief Put raw data into queue
+     *
+     * This function creates appropriate Request with given data before
+     * putting it into queue.
+     * If queue is full the request will be dropped.
+     * If length is larger than PARAMETER_SIZE the request will be dropped.
+     * After successfull operation, the waiting thread will be notified.
+     *
+     * @param data    The buffer with the request data
+     * @param length  The length of the request
+     */
+    void put(const uint8_t* data, size_t length);
 
-  /**
-   * @brief Get request from queue.
-   *
-   * If queue is empty, the function waits for a request.
-   *
-   * @return The request reveived from queue.
-   */
-  void get(Request<PARAMETER_SIZE> &request);
+    /**
+     * @brief Get request from queue.
+     *
+     * If queue is empty, the function waits for a request.
+     *
+     * @return The request reveived from queue.
+     */
+    void get(Request<PARAMETER_SIZE>& request);
 
-  /**
-   * @brief Checks if queue is empty.
-   *
-   * @return true is queue is empty, otherwise false
-   */
-  bool is_empty() const;
+    /**
+     * @brief Checks if queue is empty.
+     *
+     * @return true is queue is empty, otherwise false
+     */
+    bool is_empty() const;
 
-private:
-  const size_t m_max_elements;
-  mutable std::mutex m_mutex;
-  mutable std::condition_variable m_cv;
-  std::queue<Request<PARAMETER_SIZE>> m_queue;
+  private:
+    const size_t m_max_elements;
+    mutable std::mutex m_mutex;
+    mutable std::condition_variable m_cv;
+    std::queue<Request<PARAMETER_SIZE>> m_queue;
 };
 
-template <size_t PARAMETER_SIZE>
+template<size_t PARAMETER_SIZE>
 Queue<PARAMETER_SIZE>::Queue(size_t max_elements)
-    : m_max_elements(max_elements) {}
-
-template <size_t PARAMETER_SIZE>
-void Queue<PARAMETER_SIZE>::put(const Request<PARAMETER_SIZE> &request) {
-  m_mutex.lock();
-  if (m_queue.size() >= m_max_elements) {
-    std::cerr << "Message loss - queue is full, " << m_max_elements
-              << " allowed" << std::endl;
-    m_mutex.unlock();
-  } else {
-    m_queue.push(request);
-    m_mutex.unlock();
-    m_cv.notify_one();
-    sched_yield();
-  }
+    : m_max_elements(max_elements)
+{
 }
 
-template <size_t PARAMETER_SIZE>
-void Queue<PARAMETER_SIZE>::put(const uint8_t *data, size_t length) {
-  m_mutex.lock();
-  static Request<PARAMETER_SIZE> request;
-
-  if (length > PARAMETER_SIZE) {
-    std::cerr << "Internal error - queue accepts messages with size "
-              << PARAMETER_SIZE << std::endl;
-    m_mutex.unlock();
-  }
-
-  memcpy(request.m_data, data, length);
-  request.m_length = length;
-
-  if (m_queue.size() > m_max_elements) {
-    std::cerr << "Message loss - queue is full, " << m_max_elements
-              << " allowed" << std::endl;
-    m_mutex.unlock();
-  } else {
-    m_queue.push(request);
-    m_mutex.unlock();
-    m_cv.notify_one();
-    sched_yield();
-  }
-}
-
-template <size_t PARAMETER_SIZE>
-void Queue<PARAMETER_SIZE>::get(Request<PARAMETER_SIZE> &request) {
-  std::unique_lock<std::mutex> lock(m_mutex);
-  while (true) {
-    if (m_queue.empty()) {
-      m_cv.wait(lock);
+template<size_t PARAMETER_SIZE>
+void
+Queue<PARAMETER_SIZE>::put(const Request<PARAMETER_SIZE>& request)
+{
+    m_mutex.lock();
+    if(m_queue.size() >= m_max_elements) {
+        std::cerr << "Message loss - queue is full, " << m_max_elements << " allowed" << std::endl;
+        m_mutex.unlock();
     } else {
-      request = m_queue.front();
-      m_queue.pop();
-      lock.unlock();
-      return;
+        m_queue.push(request);
+        m_mutex.unlock();
+        m_cv.notify_one();
+        sched_yield();
     }
-  }
 }
 
-template <size_t PARAMETER_SIZE> bool Queue<PARAMETER_SIZE>::is_empty() const {
-  std::unique_lock<std::mutex> lock(m_mutex);
-  return m_queue.empty();
+template<size_t PARAMETER_SIZE>
+void
+Queue<PARAMETER_SIZE>::put(const uint8_t* data, size_t length)
+{
+    m_mutex.lock();
+    static Request<PARAMETER_SIZE> request;
+
+    if(length > PARAMETER_SIZE) {
+        std::cerr << "Internal error - queue accepts messages with size " << PARAMETER_SIZE << std::endl;
+        m_mutex.unlock();
+    }
+
+    memcpy(request.m_data, data, length);
+    request.m_length = length;
+
+    if(m_queue.size() > m_max_elements) {
+        std::cerr << "Message loss - queue is full, " << m_max_elements << " allowed" << std::endl;
+        m_mutex.unlock();
+    } else {
+        m_queue.push(request);
+        m_mutex.unlock();
+        m_cv.notify_one();
+        sched_yield();
+    }
+}
+
+template<size_t PARAMETER_SIZE>
+void
+Queue<PARAMETER_SIZE>::get(Request<PARAMETER_SIZE>& request)
+{
+    std::unique_lock<std::mutex> lock(m_mutex);
+    while(true) {
+        if(m_queue.empty()) {
+            m_cv.wait(lock);
+        } else {
+            request = m_queue.front();
+            m_queue.pop();
+            lock.unlock();
+            return;
+        }
+    }
+}
+
+template<size_t PARAMETER_SIZE>
+bool
+Queue<PARAMETER_SIZE>::is_empty() const
+{
+    std::unique_lock<std::mutex> lock(m_mutex);
+    return m_queue.empty();
 }
 } // namespace taste
 

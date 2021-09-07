@@ -36,26 +36,26 @@ namespace taste {
  * @brief Concurrency Lock implementation
  */
 class Lock final {
-public:
-  /**
-   * @brief Default constructor.
-   *
-   * Constructed lock is in 'unlocked' state.
-   */
-  Lock();
-  Lock(const Lock &) = delete;
-  Lock(Lock &&) = delete;
+  public:
+    /**
+     * @brief Default constructor.
+     *
+     * Constructed lock is in 'unlocked' state.
+     */
+    Lock();
+    Lock(const Lock&) = delete;
+    Lock(Lock&&) = delete;
 
-  Lock &operator=(const Lock &) = delete;
-  Lock &operator=(Lock &&) = delete;
+    Lock& operator=(const Lock&) = delete;
+    Lock& operator=(Lock&&) = delete;
 
-  /// @brief acquire lock
-  void lock();
-  /// @release lock
-  void unlock();
+    /// @brief acquire lock
+    void lock();
+    /// @release lock
+    void unlock();
 
-private:
-  std::mutex m_mutex;
+  private:
+    std::mutex m_mutex;
 };
 } // namespace taste
 

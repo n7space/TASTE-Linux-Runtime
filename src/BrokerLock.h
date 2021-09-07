@@ -31,11 +31,12 @@
  * runtime with c-linkage.
  */
 
-extern "C" {
-/// @brief function used by Broker to acquire the lock.
-void Broker_acquire_lock();
-/// @brief function used by Broker to release the lock.
-void Broker_release_lock();
+extern "C"
+{
+    /// @brief function used by Broker to acquire the lock.
+    void Broker_acquire_lock();
+    /// @brief function used by Broker to release the lock.
+    void Broker_release_lock();
 }
 
 #endif

@@ -36,46 +36,46 @@ namespace taste {
  * @brief Thread implementation for TASTE
  */
 class Thread final {
-public:
-  /**
-   * @brief Create a thread, without starting it
-   *
-   * @param priority     Priority of thread
-   * @param stack_size   Stack size for new thread in bytes
-   */
-  Thread(const int priority, const size_t stack_size);
-  Thread(const Thread &) = delete;
-  Thread(Thread &&) = delete;
-  Thread &operator=(const Thread &) = delete;
-  Thread &operator=(Thread &&) = delete;
+  public:
+    /**
+     * @brief Create a thread, without starting it
+     *
+     * @param priority     Priority of thread
+     * @param stack_size   Stack size for new thread in bytes
+     */
+    Thread(const int priority, const size_t stack_size);
+    Thread(const Thread&) = delete;
+    Thread(Thread&&) = delete;
+    Thread& operator=(const Thread&) = delete;
+    Thread& operator=(Thread&&) = delete;
 
-  /**
-   * @brief Starts a thread
-   *
-   * @param method  A function which will be executed inside new thread.
-   */
-  void start(void (*method)());
+    /**
+     * @brief Starts a thread
+     *
+     * @param method  A function which will be executed inside new thread.
+     */
+    void start(void (*method)());
 
-  /**
-   * @brief Starts a thread with parameter
-   *
-   * @param method  A function which will be executed inside new thread.
-   * @param param   A parameter for function.
-   */
-  void start(void (*method)(void *), void *param);
+    /**
+     * @brief Starts a thread with parameter
+     *
+     * @param method  A function which will be executed inside new thread.
+     * @param param   A parameter for function.
+     */
+    void start(void (*method)(void*), void* param);
 
-private:
-  void create_thread(void *(*fn)(void *), void *param);
-  static void *method_wrapper(void *param);
-  static void *method_wrapper_with_parameter(void *param);
+  private:
+    void create_thread(void* (*fn)(void*), void* param);
+    static void* method_wrapper(void* param);
+    static void* method_wrapper_with_parameter(void* param);
 
-private:
-  int m_priority;
-  int m_stack_size;
-  pthread_t m_thread_id;
+  private:
+    int m_priority;
+    int m_stack_size;
+    pthread_t m_thread_id;
 
-  void (*m_method)(void *);
-  void *m_param;
+    void (*m_method)(void*);
+    void* m_param;
 };
 } // namespace taste
 
