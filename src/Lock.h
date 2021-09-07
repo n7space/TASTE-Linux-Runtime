@@ -25,7 +25,7 @@
 
 /**
  * @file     Lock.h
- * @brief    Implemntation of lock required by TASTE function blocks.
+ * @brief    Implementation of lock required by TASTE function blocks.
  *
  */
 
@@ -52,7 +52,7 @@ class Lock final
 
     /// @brief acquire lock
     void lock();
-    /// @release lock
+    /// @brief release lock
     void unlock();
 
   private:

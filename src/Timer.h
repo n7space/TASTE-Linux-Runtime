@@ -46,18 +46,18 @@ class Timer final
      * @param callback   function like object to execute.
      */
     template<typename T>
-    void run(std::chrono::milliseconds interval, T callback);
+    void run(const std::chrono::milliseconds interval, T callback);
 };
 
 template<typename T>
 void
-Timer::run(std::chrono::milliseconds interval, T callback)
+Timer::run(const std::chrono::milliseconds interval, T callback)
 {
     auto currentTime = std::chrono::steady_clock::now();
     while(true) {
         using namespace std::chrono_literals;
-        auto jitter = std::chrono::steady_clock::now() - currentTime;
-        auto diff = interval - jitter;
+        const auto jitter = std::chrono::steady_clock::now() - currentTime;
+        const auto diff = interval - jitter;
         if(diff > 0ms) {
             std::this_thread::sleep_for(diff);
         }

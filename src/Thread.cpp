@@ -25,6 +25,12 @@
 #include <iostream>
 
 namespace taste {
+Thread::Thread(const int priority, const size_t stack_size)
+    : m_priority(priority)
+    , m_stack_size(stack_size)
+{
+}
+
 void
 Thread::start(void (*method)())
 {
@@ -45,12 +51,6 @@ Thread::start(void (*method)(void*), void* param)
     // therefore the parameter for method_wrapper_with_parameter
     // is this
     create_thread(&Thread::method_wrapper_with_parameter, reinterpret_cast<void*>(this));
-}
-
-Thread::Thread(const int priority, const size_t stack_size)
-    : m_priority(priority)
-    , m_stack_size(stack_size)
-{
 }
 
 void

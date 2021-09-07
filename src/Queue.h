@@ -53,7 +53,7 @@ class Queue final
      *
      * @param max_elements    Maximum number of elements
      */
-    Queue(size_t max_elements);
+    Queue(const size_t max_elements);
 
     Queue(const Queue&) = delete;
     Queue(Queue&&) = delete;
@@ -109,7 +109,7 @@ class Queue final
 };
 
 template<size_t PARAMETER_SIZE>
-Queue<PARAMETER_SIZE>::Queue(size_t max_elements)
+Queue<PARAMETER_SIZE>::Queue(const size_t max_elements)
     : m_max_elements(max_elements)
 {
 }
