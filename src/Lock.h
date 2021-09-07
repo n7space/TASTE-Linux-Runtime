@@ -35,7 +35,8 @@ namespace taste {
 /**
  * @brief Concurrency Lock implementation
  */
-class Lock final {
+class Lock final
+{
   public:
     /**
      * @brief Default constructor.

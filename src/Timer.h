@@ -35,7 +35,8 @@ namespace taste {
 /**
  * @brief Times is used to implement cyclic interfaces in TASTE
  */
-class Timer final {
+class Timer final
+{
   public:
     /**
      * @brief Execute given operation with given interval.

@@ -45,7 +45,8 @@ namespace taste {
  * @tparam PARAMETER_SIZE The maximum size of single request in bytes.
  */
 template<size_t PARAMETER_SIZE>
-class Queue final {
+class Queue final
+{
   public:
     /**
      * @brief Constructor

@@ -38,7 +38,8 @@ namespace taste {
  * @tparam PARAMETER_SIZE The maximum size of request in bytes.
  */
 template<size_t PARAMETER_SIZE>
-struct Request final {
+struct Request final
+{
     /**
      * @brief Default constructor
      *

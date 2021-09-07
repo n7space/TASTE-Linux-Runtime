@@ -35,7 +35,8 @@ namespace taste {
 /**
  * @brief Thread implementation for TASTE
  */
-class Thread final {
+class Thread final
+{
   public:
     /**
      * @brief Create a thread, without starting it
