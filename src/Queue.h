@@ -55,10 +55,16 @@ class Queue final
      */
     Queue(const size_t max_elements);
 
+    /// @brief deleted copy constructor
     Queue(const Queue&) = delete;
+
+    /// @brief deleted move constructor
     Queue(Queue&&) = delete;
 
+    /// @brief deleted copy assignment operator
     Queue& operator=(const Queue&) = delete;
+
+    /// @brief deleted move assignment operator
     Queue& operator=(Queue&&) = delete;
 
     /**
@@ -142,8 +148,8 @@ Queue<PARAMETER_SIZE>::put(const uint8_t* data, size_t length)
         m_mutex.unlock();
     }
 
-    memcpy(request.m_data, data, length);
-    request.m_length = length;
+    memcpy(request.data(), data, length);
+    request.set_length(length);
 
     if(m_queue.size() > m_max_elements) {
         std::cerr << "Message loss - queue is full, " << m_max_elements << " allowed" << std::endl;

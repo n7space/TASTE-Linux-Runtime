@@ -23,8 +23,6 @@
 #include "Lock.h"
 
 namespace taste {
-Lock::Lock() {}
-
 void
 Lock::lock()
 {

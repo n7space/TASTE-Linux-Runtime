@@ -30,6 +30,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <array>
 
 namespace taste {
 /**
@@ -47,23 +48,50 @@ struct Request final
      */
     Request();
 
-    /// @brief copy constructor
-    Request(const Request& other);
+    /// @brief default copy constructor
+    Request(const Request& other) = default;
 
-    /// @brief move constructor
-    Request(Request&& other);
+    /// @brief default move constructor
+    Request(Request&& other) = default;
 
-    /// @brief copy assignment operator
-    Request& operator=(const Request& rhs);
+    /// @brief default copy assignment operator
+    Request& operator=(const Request& rhs) = default;
 
-    /// @brief move assignment operator
-    Request& operator=(Request&& rhs);
+    /// @brief default move assignment operator
+    Request& operator=(Request&& rhs) = default;
 
-    /// @brief the length of the request in bytes
+    /** @brief get length of the request in bytes
+     *
+     * @return the actual length of data
+     */
+    uint32_t length() const;
+
+    /**
+     * @brief set the request length
+     *
+     * The value shall be between 0 and PARAMETER_SIZE
+     *
+     * @param value    new length value
+     */
+    void set_length(uint32_t value);
+
+    /**
+     * @brief get the request data
+     *
+     * @return pointer to data
+     */
+    uint8_t* data();
+
+    /**
+     * @brief the buffer with the request data
+     *
+     * @return constant pointer to data
+     */
+    const uint8_t* data() const;
+
+  private:
     uint32_t m_length;
-
-    /// @brief the buffer with the request data
-    uint8_t m_data[PARAMETER_SIZE];
+    std::array<uint8_t, PARAMETER_SIZE> m_data;
 };
 
 template<size_t PARAMETER_SIZE>
@@ -73,37 +101,34 @@ Request<PARAMETER_SIZE>::Request()
 }
 
 template<size_t PARAMETER_SIZE>
-Request<PARAMETER_SIZE>::Request(const Request& other)
-    : m_length(other.m_length)
+uint32_t
+Request<PARAMETER_SIZE>::length() const
 {
-    memcpy(m_data, other.m_data, PARAMETER_SIZE);
+    return m_length;
 }
 
 template<size_t PARAMETER_SIZE>
-Request<PARAMETER_SIZE>::Request(Request&& other)
-    : m_length(other.m_length)
+void
+Request<PARAMETER_SIZE>::set_length(uint32_t value)
 {
-    memcpy(m_data, other.m_data, PARAMETER_SIZE);
+    if(value <= PARAMETER_SIZE && value >= 0) {
+        m_length = value;
+    }
 }
 
 template<size_t PARAMETER_SIZE>
-Request<PARAMETER_SIZE>&
-Request<PARAMETER_SIZE>::operator=(const Request& rhs)
+uint8_t*
+Request<PARAMETER_SIZE>::data()
 {
-    m_length = rhs.m_length;
-    memcpy(m_data, rhs.m_data, PARAMETER_SIZE);
-    return *this;
+    return m_data.data();
 }
 
 template<size_t PARAMETER_SIZE>
-Request<PARAMETER_SIZE>&
-Request<PARAMETER_SIZE>::operator=(Request&& rhs)
+const uint8_t*
+Request<PARAMETER_SIZE>::data() const
 {
-    m_length = rhs.m_length;
-    memcpy(m_data, rhs.m_data, PARAMETER_SIZE);
-    return *this;
+    return m_data.data();
 }
-
 } // namespace taste
 
 #endif

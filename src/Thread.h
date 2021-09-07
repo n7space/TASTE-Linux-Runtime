@@ -45,9 +45,17 @@ class Thread final
      * @param stack_size   Stack size for new thread in bytes
      */
     Thread(const int priority, const size_t stack_size);
+
+    /// @brief deleted copy constructor
     Thread(const Thread&) = delete;
+
+    /// @brief deleted move constructor
     Thread(Thread&&) = delete;
+
+    /// @brief deleted copy assignment operator
     Thread& operator=(const Thread&) = delete;
+
+    /// @brief deleted move assignment operator
     Thread& operator=(Thread&&) = delete;
 
     /**

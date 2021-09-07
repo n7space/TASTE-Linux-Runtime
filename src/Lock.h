@@ -43,11 +43,18 @@ class Lock final
      *
      * Constructed lock is in 'unlocked' state.
      */
-    Lock();
+    Lock() = default;
+
+    /// @brief deleted copy constructor
     Lock(const Lock&) = delete;
+
+    /// @brief deleted move constructor
     Lock(Lock&&) = delete;
 
+    /// @brief deleted copy assignment operator
     Lock& operator=(const Lock&) = delete;
+
+    /// @brief deleted move assignment operator
     Lock& operator=(Lock&&) = delete;
 
     /// @brief acquire lock
