@@ -1,13 +1,13 @@
 add_library(LinuxRuntime STATIC)
 target_sources(LinuxRuntime
-  PRIVATE      broker_lock.h
-               lock.h
-               queue.h
-               request.h
-               thread.h
-               timer.h
-  PUBLIC       lock.cpp
-               thread.cpp
-               broker_lock.cpp)
+  PRIVATE      BrokerLock.h
+               Lock.h
+               Queue.h
+               Request.h
+               Thread.h
+               Timer.h
+  PUBLIC       Lock.cpp
+               Thread.cpp
+               BrokerLock.cpp)
 
 add_format_target(LinuxRuntime)

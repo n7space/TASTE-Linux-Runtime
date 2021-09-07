@@ -31,7 +31,7 @@
 
 #include <sched.h>
 
-#include "request.h"
+#include "Request.h"
 
 namespace taste {
 template <size_t PARAMETER_SIZE> class Queue final {

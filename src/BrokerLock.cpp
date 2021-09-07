@@ -20,14 +20,16 @@
  * limitations under the License.
  */
 
-#include "lock.h"
+#include "BrokerLock.h"
 
-namespace taste {
-Lock::Lock() {}
+#include "Lock.h"
 
-Lock::~Lock() {}
+namespace {
+taste::Lock broker_lock;
+}
 
-void Lock::lock() { m_mutex.lock(); }
+extern "C" {
+void Broker_acquire_lock() { broker_lock.lock(); }
 
-void Lock::unlock() { m_mutex.unlock(); }
-} // namespace taste
+void Broker_release_lock() { broker_lock.unlock(); }
+}
