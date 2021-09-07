@@ -43,7 +43,7 @@ public:
    * @param priority     Priority of thread
    * @param stack_size   Stack size for new thread in bytes
    */
-  Thread(int priority, size_t stack_size);
+  Thread(const int priority, const size_t stack_size);
   Thread(const Thread &) = delete;
   Thread(Thread &&) = delete;
   Thread &operator=(const Thread &) = delete;

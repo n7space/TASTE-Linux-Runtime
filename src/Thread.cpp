@@ -38,7 +38,7 @@ void Thread::start(void (*method)(void *), void *param) {
                 reinterpret_cast<void *>(this));
 }
 
-Thread::Thread(int priority, size_t stack_size)
+Thread::Thread(const int priority, const size_t stack_size)
     : m_priority(priority), m_stack_size(stack_size) {}
 
 void Thread::create_thread(void *(*fn)(void *), void *param) {
