@@ -46,15 +46,15 @@ set(GCC_WARNINGS ${CLANG_WARNINGS}
 
 if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
     set(PROJECT_WARNINGS ${CLANG_WARNINGS})
-  elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
     set(PROJECT_WARNINGS ${GCC_WARNINGS})
-  endif()
+endif()
 
-  target_compile_options(common_build_options INTERFACE ${PROJECT_WARNINGS})
+target_compile_options(common_build_options INTERFACE ${PROJECT_WARNINGS})
 
 include(CppCheck)
 include(ClangTidy)
 include(ClangFormat)
 include(Doxygen)
-  
+
 add_subdirectory(src)
