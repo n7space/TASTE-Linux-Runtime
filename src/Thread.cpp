@@ -28,12 +28,18 @@ namespace taste {
 void Thread::start(void (*method)()) {
   m_method = nullptr;
   m_param = nullptr;
+  // the method is passed as an argument to method_wrapper
+  // the fields shall be set to nullptr.
   create_thread(&Thread::method_wrapper, reinterpret_cast<void *>(method));
 }
 
 void Thread::start(void (*method)(void *), void *param) {
   m_method = method;
   m_param = param;
+  // the parameters for method_wrapper_with_parameter
+  // are passed using m_method and m_param fields.
+  // therefore the parameter for method_wrapper_with_parameter
+  // is this
   create_thread(&Thread::method_wrapper_with_parameter,
                 reinterpret_cast<void *>(this));
 }
