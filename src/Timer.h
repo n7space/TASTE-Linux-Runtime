@@ -53,17 +53,17 @@ template<typename T>
 void
 Timer::run(const std::chrono::milliseconds interval, T callback)
 {
-    auto currentTime = std::chrono::steady_clock::now();
+    auto referenceTime = std::chrono::steady_clock::now();
     while(true) {
         using namespace std::chrono_literals;
-        const auto jitter = std::chrono::steady_clock::now() - currentTime;
-        const auto diff = interval - jitter;
+        const auto elapsedTime = std::chrono::steady_clock::now() - referenceTime;
+        const auto diff = interval - elapsedTime;
         if(diff > 0ms) {
             std::this_thread::sleep_for(diff);
         }
         callback();
 
-        currentTime = std::chrono::steady_clock::now();
+        referenceTime = std::chrono::steady_clock::now();
     }
 }
 
