@@ -73,6 +73,9 @@ class Thread final
      */
     void start(void (*method)(void*), void* param);
 
+    /// @brief Waits for the thread to finish
+    void join();
+
   private:
     void create_thread(void* (*fn)(void*), void* param);
     static void* method_wrapper(void* param);

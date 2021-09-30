@@ -54,6 +54,12 @@ Thread::start(void (*method)(void*), void* param)
 }
 
 void
+Thread::join()
+{
+    pthread_join(m_thread_id, nullptr);
+}
+
+void
 Thread::create_thread(void* (*fn)(void*), void* param)
 {
     pthread_attr_t thread_attributes;
