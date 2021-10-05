@@ -28,4 +28,6 @@ Timer::initialize()
 {
     m_global_start_time = std::chrono::steady_clock::now();
 }
+
+std::chrono::steady_clock::time_point Timer::m_global_start_time = {};
 } // namespace taste

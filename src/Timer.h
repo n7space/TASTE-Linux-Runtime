@@ -47,7 +47,9 @@ class Timer final
      * @param callback          function like object to execute
      */
     template<typename T>
-    void run(const std::chrono::milliseconds dispatch_offset, const std::chrono::milliseconds interval, T callback);
+    static void run(const std::chrono::milliseconds dispatch_offset,
+                    const std::chrono::milliseconds interval,
+                    T callback);
 
     /**
      * @brief Initialize Timer
