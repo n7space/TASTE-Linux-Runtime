@@ -8,6 +8,7 @@ target_sources(LinuxRuntime
                Timer.h
   PUBLIC       Lock.cpp
                Thread.cpp
-               BrokerLock.cpp)
+               BrokerLock.cpp
+			   Timer.cpp)
 
 add_format_target(LinuxRuntime)
