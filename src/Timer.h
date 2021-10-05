@@ -41,23 +41,38 @@ class Timer final
     /**
      * @brief Execute given operation with given interval.
      *
-     * @tparam T         callback type
-     * @param interval   interval value
-     * @param callback   function like object to execute.
+     * @tparam T                callback type
+     * @param dispatch_offset   dispatch offset value
+     * @param period            period value
+     * @param callback          function like object to execute
      */
     template<typename T>
-    void run(const std::chrono::milliseconds interval, T callback);
+    static void run(const std::chrono::milliseconds dispatch_offset,
+                    const std::chrono::milliseconds interval,
+                    T callback);
+
+    /**
+     * @brief Initialize Timer
+     *
+     * This shall be used before starthing threads.
+     * This method initializes start time, which is used by all cyclic interfaces
+     * to schedule execution.
+     */
+    static void initialize();
+
+  private:
+    static std::chrono::steady_clock::time_point m_global_start_time;
 };
 
 template<typename T>
 void
-Timer::run(const std::chrono::milliseconds interval, T callback)
+Timer::run(const std::chrono::milliseconds dispatch_offset, const std::chrono::milliseconds period, T callback)
 {
-    auto wakeupTime = std::chrono::steady_clock::now();
+    auto wakeup_time = m_global_start_time + dispatch_offset;
     while(true) {
-        wakeupTime = wakeupTime + interval;
-        std::this_thread::sleep_until(wakeupTime);
+        std::this_thread::sleep_until(wakeup_time);
         callback();
+        wakeup_time = wakeup_time + period;
     }
 }
 
