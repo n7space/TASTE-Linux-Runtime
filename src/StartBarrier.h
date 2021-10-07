@@ -68,7 +68,6 @@ class StartBarrier
 
   private:
     static pthread_barrier_t m_init_barrier;
-    static pthread_barrier_t m_thread_barrier;
     static InitCallback m_init_callback;
     static std::once_flag m_init_callback_flag;
 };

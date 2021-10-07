@@ -28,7 +28,6 @@ StartBarrier::initialize(size_t number, InitCallback init_callback)
 {
     m_init_callback = init_callback;
     pthread_barrier_init(&m_init_barrier, nullptr, number);
-    pthread_barrier_init(&m_thread_barrier, nullptr, number);
 }
 
 void
@@ -36,11 +35,9 @@ StartBarrier::wait()
 {
     pthread_barrier_wait(&m_init_barrier);
     std::call_once(m_init_callback_flag, m_init_callback);
-    pthread_barrier_wait(&m_thread_barrier);
 }
 
 pthread_barrier_t StartBarrier::m_init_barrier;
-pthread_barrier_t StartBarrier::m_thread_barrier;
 StartBarrier::InitCallback StartBarrier::m_init_callback;
 std::once_flag StartBarrier::m_init_callback_flag;
 } // namespace taste
