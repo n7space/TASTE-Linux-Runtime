@@ -67,28 +67,29 @@ Thread::create_thread(void* (*fn)(void*), void* param)
     int res = pthread_attr_init(&thread_attributes);
     if(res != 0) {
         std::cerr << "Unable to initialize thread attributes" << std::endl;
-        return;
+        exit(EXIT_FAILURE);
     }
 
     res = pthread_attr_setstacksize(&thread_attributes, m_stack_size);
     if(res != 0) {
         std::cerr << "Unable to set stack size in thread attributes" << std::endl;
-        return;
+        exit(EXIT_FAILURE);
     }
 
     int policy = SCHED_FIFO;
     res = pthread_attr_setschedpolicy(&thread_attributes, policy);
     if(res != 0) {
         std::cerr << "Unable to set sched policy in thread attributes" << std::endl;
-        return;
+        exit(EXIT_FAILURE);
     }
 
     int minimum_sched_priority = sched_get_priority_min(policy);
     int maximum_sched_priority = sched_get_priority_max(policy);
 
     if(m_priority < minimum_sched_priority || m_priority > maximum_sched_priority) {
-        std::cerr << "Invalid thread priority value." << std::endl;
-        return;
+        std::cerr << "Invalid thread priority value: min:" << minimum_sched_priority
+                  << " max:" << maximum_sched_priority << " requested:" << m_priority << std::endl;
+        exit(EXIT_FAILURE);
     }
 
     sched_param sp;
@@ -96,12 +97,13 @@ Thread::create_thread(void* (*fn)(void*), void* param)
     res = pthread_attr_setschedparam(&thread_attributes, &sp);
     if(res != 0) {
         std::cerr << "Unable to set priority in thread attributes" << std::endl;
-        return;
+        exit(EXIT_FAILURE);
     }
 
     res = pthread_create(&m_thread_id, &thread_attributes, fn, param);
     if(res != 0) {
         std::cerr << "Unable to create thread" << std::endl;
+        exit(EXIT_FAILURE);
     }
 
     pthread_attr_destroy(&thread_attributes);
