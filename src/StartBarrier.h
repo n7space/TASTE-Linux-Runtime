@@ -35,13 +35,13 @@
 
 namespace taste {
 /**
- * @brief Thread implementation for TASTE
+ * @brief StartBarrier used to synchronize threads in TASTE
  */
 class StartBarrier
 {
   public:
     /**
-     * @brief Type Definition of init callback function
+     * @brief Type definition of init callback function
      */
     using InitCallback = std::function<void()>;
 
@@ -55,14 +55,14 @@ class StartBarrier
      *
      * This function initializes StartBarrier to synchronize fixed amount of threads.
      * The initialization callback will be called only once,
-     * before all continuation of all threads
+     * before continuation of all threads
      *
      * @param number number of threads
      * @param init_callback callback which will be called once
      */
     static void initialize(size_t number, InitCallback init_callback);
     /**
-     * @brief wait for other threads
+     * @brief wait for all threads to reach this point and call init callback
      */
     static void wait();
 
