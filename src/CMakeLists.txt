@@ -6,9 +6,11 @@ target_sources(LinuxRuntime
                Request.h
                Thread.h
                Timer.h
+               StartBarrier.h
   PUBLIC       Lock.cpp
                Thread.cpp
                BrokerLock.cpp
-               Timer.cpp)
+               Timer.cpp
+               StartBarrier.cpp)
 
 add_format_target(LinuxRuntime)
