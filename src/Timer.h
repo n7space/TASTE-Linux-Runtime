@@ -43,7 +43,7 @@ class Timer final
      *
      * @tparam T                callback type
      * @param dispatch_offset   dispatch offset value
-     * @param period            period value
+     * @param interval          period value
      * @param callback          function like object to execute
      */
     template<typename T>
