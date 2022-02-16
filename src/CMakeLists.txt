@@ -7,10 +7,10 @@ target_sources(LinuxRuntime
                Thread.h
                Timer.h
                StartBarrier.h
-  PUBLIC       Lock.cpp
-               Thread.cpp
-               BrokerLock.cpp
-               Timer.cpp
-               StartBarrier.cpp)
+  PUBLIC       Lock.cc
+               Thread.cc
+               BrokerLock.cc
+               Timer.cc
+               StartBarrier.cc)
 
 add_format_target(LinuxRuntime)
