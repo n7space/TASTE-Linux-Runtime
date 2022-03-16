@@ -132,7 +132,6 @@ Queue<PARAMETER_SIZE>::put(const Request<PARAMETER_SIZE>& request)
         m_queue.push(request);
         m_mutex.unlock();
         m_cv.notify_one();
-        sched_yield();
     }
 }
 
@@ -151,14 +150,13 @@ Queue<PARAMETER_SIZE>::put(const uint8_t* data, size_t length)
     memcpy(request.data(), data, length);
     request.set_length(length);
 
-    if(m_queue.size() > m_max_elements) {
+    if(m_queue.size() >= m_max_elements) {
         std::cerr << "Message loss - queue is full, " << m_max_elements << " allowed" << std::endl;
         m_mutex.unlock();
     } else {
         m_queue.push(request);
         m_mutex.unlock();
         m_cv.notify_one();
-        sched_yield();
     }
 }
 
