@@ -52,6 +52,7 @@ class Queue final
      * @brief Constructor
      *
      * @param max_elements    Maximum number of elements
+     * @param queue_name      Name of the queue used for error messages
      */
     Queue(const size_t max_elements, const char* queue_name);
 
