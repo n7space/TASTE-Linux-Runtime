@@ -52,8 +52,9 @@ class Queue final
      * @brief Constructor
      *
      * @param max_elements    Maximum number of elements
+     * @param queue_name      Name of the queue used for error messages
      */
-    Queue(const size_t max_elements);
+    Queue(const size_t max_elements, const char* queue_name);
 
     /// @brief deleted copy constructor
     Queue(const Queue&) = delete;
@@ -109,14 +110,16 @@ class Queue final
 
   private:
     const size_t m_max_elements;
+    const char* m_queue_name;
     mutable std::mutex m_mutex;
     mutable std::condition_variable m_cv;
     std::queue<Request<PARAMETER_SIZE>> m_queue;
 };
 
 template<size_t PARAMETER_SIZE>
-Queue<PARAMETER_SIZE>::Queue(const size_t max_elements)
+Queue<PARAMETER_SIZE>::Queue(const size_t max_elements, const char* queue_name)
     : m_max_elements(max_elements)
+    , m_queue_name(queue_name)
 {
 }
 
@@ -126,7 +129,8 @@ Queue<PARAMETER_SIZE>::put(const Request<PARAMETER_SIZE>& request)
 {
     m_mutex.lock();
     if(m_queue.size() >= m_max_elements) {
-        std::cerr << "Message loss - queue is full, " << m_max_elements << " allowed" << std::endl;
+        std::cerr << "Message loss in " << m_queue_name << " - queue is full, " << m_max_elements << " allowed"
+                  << std::endl;
         m_mutex.unlock();
     } else {
         m_queue.push(request);
@@ -143,7 +147,8 @@ Queue<PARAMETER_SIZE>::put(const uint8_t* data, size_t length)
     static Request<PARAMETER_SIZE> request;
 
     if(length > PARAMETER_SIZE) {
-        std::cerr << "Internal error - queue accepts messages with size " << PARAMETER_SIZE << std::endl;
+        std::cerr << "Internal error in " << m_queue_name << " - queue accepts messages with size " << PARAMETER_SIZE
+                  << std::endl;
         m_mutex.unlock();
     }
 
@@ -151,7 +156,8 @@ Queue<PARAMETER_SIZE>::put(const uint8_t* data, size_t length)
     request.set_length(length);
 
     if(m_queue.size() >= m_max_elements) {
-        std::cerr << "Message loss - queue is full, " << m_max_elements << " allowed" << std::endl;
+        std::cerr << "Message loss in " << m_queue_name << " - queue is full, " << m_max_elements << " allowed"
+                  << std::endl;
         m_mutex.unlock();
     } else {
         m_queue.push(request);
