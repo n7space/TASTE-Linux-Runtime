@@ -31,6 +31,7 @@
 #include <cstdint>
 #include <cstring>
 #include <array>
+#include "dataview-uniq.h"
 
 namespace taste {
 /**
@@ -89,9 +90,24 @@ struct Request final
      */
     const uint8_t* data() const;
 
+    /**
+     * @brief get the sender pid
+     *
+     * @return sender pid
+     */
+    asn1SccPID sender_pid() const;
+
+    /**
+     * @brief set the sender pid
+     * 
+     * @param sender_pid    sender pid
+     */
+    void set_sender_pid(asn1SccPID sender_pid);
+
   private:
     uint32_t m_length;
     std::array<uint8_t, PARAMETER_SIZE> m_data;
+    asn1SccPID m_sender_pid;
 };
 
 template<size_t PARAMETER_SIZE>
@@ -128,6 +144,20 @@ const uint8_t*
 Request<PARAMETER_SIZE>::data() const
 {
     return m_data.data();
+}
+
+template<size_t PARAMETER_SIZE>
+asn1SccPID
+Request<PARAMETER_SIZE>::sender_pid() const
+{
+    return m_sender_pid;
+}
+
+template<size_t PARAMETER_SIZE>
+void
+Request<PARAMETER_SIZE>::set_sender_pid(asn1SccPID sender_pid)
+{
+    m_sender_pid = sender_pid;
 }
 } // namespace taste
 
