@@ -87,10 +87,11 @@ class Queue final
      * If length is larger than PARAMETER_SIZE the request will be dropped.
      * After successfull operation, the waiting thread will be notified.
      *
-     * @param data    The buffer with the request data
-     * @param length  The length of the request
+     * @param sender_pid  The pid of the sender function
+     * @param data        The buffer with the request data
+     * @param length      The length of the request
      */
-    void put(const uint8_t* data, size_t length);
+    void put(const asn1SccPID sender_pid, const uint8_t* data, size_t length);
 
     /**
      * @brief Get request from queue.
@@ -141,7 +142,7 @@ Queue<PARAMETER_SIZE>::put(const Request<PARAMETER_SIZE>& request)
 
 template<size_t PARAMETER_SIZE>
 void
-Queue<PARAMETER_SIZE>::put(const uint8_t* data, size_t length)
+Queue<PARAMETER_SIZE>::put(const asn1SccPID sender_pid, const uint8_t* data, size_t length)
 {
     m_mutex.lock();
     static Request<PARAMETER_SIZE> request;
@@ -154,6 +155,7 @@ Queue<PARAMETER_SIZE>::put(const uint8_t* data, size_t length)
 
     memcpy(request.data(), data, length);
     request.set_length(length);
+    request.set_sender_pid(sender_pid);
 
     if(m_queue.size() >= m_max_elements) {
         std::cerr << "Message loss in " << m_queue_name << " - queue is full, " << m_max_elements << " allowed"
