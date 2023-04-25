@@ -107,7 +107,7 @@ class Queue final
     bool is_empty() const;
 
   private:
-    bool is_full() const;
+    bool check_for_message_loss() const;
 
   private:
     const size_t m_max_elements;
@@ -131,7 +131,7 @@ Queue<PARAMETER_SIZE>::put(const Request<PARAMETER_SIZE>& request)
     {
         std::lock_guard<std::mutex> lock(m_mutex);
 
-        if(is_full()) {
+        if(check_for_message_loss()) {
             return;
         }
 
@@ -148,7 +148,7 @@ Queue<PARAMETER_SIZE>::put(const asn1SccPID sender_pid, const uint8_t* data, siz
     {
         std::lock_guard<std::mutex> lock(m_mutex);
 
-        if(is_full()) {
+        if(check_for_message_loss()) {
             return;
         }
 
@@ -185,7 +185,7 @@ Queue<PARAMETER_SIZE>::is_empty() const
 
 template<size_t PARAMETER_SIZE>
 bool
-Queue<PARAMETER_SIZE>::is_full() const
+Queue<PARAMETER_SIZE>::check_for_message_loss() const
 {
     if(m_queue.size() >= m_max_elements) {
         std::cerr << "Message loss in '" << m_queue_name << "' - queue is full, " << m_max_elements

@@ -55,7 +55,7 @@ struct Request final
      *
      * Constructs Request with provided arguments
      */
-    Request(const asn1SccPID sender_pid, const uint8_t* data, size_t length);
+    Request(const asn1SccPID sender_pid, const uint8_t* const data, const size_t length);
 
     /// @brief default copy constructor
     Request(const Request& other) = default;
@@ -129,7 +129,7 @@ Request<PARAMETER_SIZE>::Request()
 }
 
 template<size_t PARAMETER_SIZE>
-Request<PARAMETER_SIZE>::Request(const asn1SccPID sender_pid, const uint8_t* data, size_t length)
+Request<PARAMETER_SIZE>::Request(const asn1SccPID sender_pid, const uint8_t* const data, const size_t length)
     : m_length(length)
     , m_sender_pid(sender_pid)
 {
