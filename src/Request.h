@@ -31,6 +31,7 @@
 #include <cstdint>
 #include <cstring>
 #include <array>
+#include <iostream>
 #include "dataview-uniq.h"
 
 namespace taste {
@@ -49,6 +50,13 @@ struct Request final
      */
     Request();
 
+    /**
+     * @brief Constructor
+     *
+     * Constructs Request with provided arguments
+     */
+    Request(const asn1SccPID sender_pid, const uint8_t* data, size_t length);
+
     /// @brief default copy constructor
     Request(const Request& other) = default;
 
@@ -65,16 +73,16 @@ struct Request final
      *
      * @return the actual length of data
      */
-    uint32_t length() const;
+    size_t length() const;
 
     /**
      * @brief set the request length
      *
-     * The value shall be between 0 and PARAMETER_SIZE
+     * The length shall be between 0 and PARAMETER_SIZE
      *
-     * @param value    new length value
+     * @param length   new length value
      */
-    void set_length(uint32_t value);
+    void set_length(size_t length);
 
     /**
      * @brief get the request data
@@ -105,19 +113,33 @@ struct Request final
     void set_sender_pid(asn1SccPID sender_pid);
 
   private:
-    uint32_t m_length;
-    std::array<uint8_t, PARAMETER_SIZE> m_data;
+    void check_length(size_t length) const;
+
+  private:
+    size_t m_length;
     asn1SccPID m_sender_pid;
+    std::array<uint8_t, PARAMETER_SIZE> m_data;
 };
 
 template<size_t PARAMETER_SIZE>
 Request<PARAMETER_SIZE>::Request()
     : m_length(0)
+    , m_sender_pid(PID_env)
 {
 }
 
 template<size_t PARAMETER_SIZE>
-uint32_t
+Request<PARAMETER_SIZE>::Request(const asn1SccPID sender_pid, const uint8_t* data, size_t length)
+    : m_length(length)
+    , m_sender_pid(sender_pid)
+{
+    check_length(length);
+
+    memcpy(m_data.data(), data, length);
+}
+
+template<size_t PARAMETER_SIZE>
+size_t
 Request<PARAMETER_SIZE>::length() const
 {
     return m_length;
@@ -125,11 +147,11 @@ Request<PARAMETER_SIZE>::length() const
 
 template<size_t PARAMETER_SIZE>
 void
-Request<PARAMETER_SIZE>::set_length(uint32_t value)
+Request<PARAMETER_SIZE>::set_length(size_t length)
 {
-    if(value <= PARAMETER_SIZE && value >= 0) {
-        m_length = value;
-    }
+    check_length(length);
+
+    m_length = length;
 }
 
 template<size_t PARAMETER_SIZE>
@@ -159,6 +181,19 @@ Request<PARAMETER_SIZE>::set_sender_pid(asn1SccPID sender_pid)
 {
     m_sender_pid = sender_pid;
 }
+
+template<size_t PARAMETER_SIZE>
+void
+Request<PARAMETER_SIZE>::check_length(size_t length) const
+{
+    if(length > PARAMETER_SIZE) {
+        std::cerr << "Request data size shall be <= " << PARAMETER_SIZE << " - new length value ("
+                  << length << ") is greater than " << PARAMETER_SIZE << std::endl;
+
+        exit(EXIT_FAILURE);
+    }
+}
+
 } // namespace taste
 
 #endif
