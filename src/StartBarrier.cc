@@ -21,19 +21,30 @@
  */
 
 #include "StartBarrier.h"
+#include <iostream>
 
 namespace taste {
 void
 StartBarrier::initialize(size_t number, InitCallback init_callback)
 {
     m_init_callback = init_callback;
-    pthread_barrier_init(&m_init_barrier, nullptr, number);
+
+    const int error_code = pthread_barrier_init(&m_init_barrier, nullptr, number);
+    if(error_code != 0) {
+        std::cerr << "Barrier has not been created properly. Error code : " << error_code << std::endl;
+        exit(EXIT_FAILURE);
+    }
 }
 
 void
 StartBarrier::wait()
 {
-    pthread_barrier_wait(&m_init_barrier);
+    const int error_code = pthread_barrier_wait(&m_init_barrier);
+    if(error_code != PTHREAD_BARRIER_SERIAL_THREAD && error_code != 0) {
+        std::cerr << "Barrier Wait has been failed. Error code : " << error_code << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
     std::call_once(m_init_callback_flag, m_init_callback);
 }
 

@@ -29,12 +29,9 @@
  */
 
 #include <condition_variable>
-#include <cstddef>
 #include <iostream>
 #include <mutex>
 #include <queue>
-
-#include <sched.h>
 
 #include "Request.h"
 
@@ -110,10 +107,13 @@ class Queue final
     bool is_empty() const;
 
   private:
+    bool check_for_message_loss() const;
+
+  private:
     const size_t m_max_elements;
     const char* m_queue_name;
     mutable std::mutex m_mutex;
-    mutable std::condition_variable m_cv;
+    mutable std::condition_variable m_condition_variable;
     std::queue<Request<PARAMETER_SIZE>> m_queue;
 };
 
@@ -128,44 +128,34 @@ template<size_t PARAMETER_SIZE>
 void
 Queue<PARAMETER_SIZE>::put(const Request<PARAMETER_SIZE>& request)
 {
-    m_mutex.lock();
-    if(m_queue.size() >= m_max_elements) {
-        std::cerr << "Message loss in " << m_queue_name << " - queue is full, " << m_max_elements << " allowed"
-                  << std::endl;
-        m_mutex.unlock();
-    } else {
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+
+        if(check_for_message_loss()) {
+            return;
+        }
+
         m_queue.push(request);
-        m_mutex.unlock();
-        m_cv.notify_one();
     }
+    
+    m_condition_variable.notify_one();
 }
 
 template<size_t PARAMETER_SIZE>
 void
 Queue<PARAMETER_SIZE>::put(const asn1SccPID sender_pid, const uint8_t* data, size_t length)
 {
-    m_mutex.lock();
-    static Request<PARAMETER_SIZE> request;
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
 
-    if(length > PARAMETER_SIZE) {
-        std::cerr << "Internal error in " << m_queue_name << " - queue accepts messages with size " << PARAMETER_SIZE
-                  << std::endl;
-        m_mutex.unlock();
+        if(check_for_message_loss()) {
+            return;
+        }
+
+        m_queue.emplace(sender_pid, data, length);
     }
 
-    memcpy(request.data(), data, length);
-    request.set_length(length);
-    request.set_sender_pid(sender_pid);
-
-    if(m_queue.size() >= m_max_elements) {
-        std::cerr << "Message loss in " << m_queue_name << " - queue is full, " << m_max_elements << " allowed"
-                  << std::endl;
-        m_mutex.unlock();
-    } else {
-        m_queue.push(request);
-        m_mutex.unlock();
-        m_cv.notify_one();
-    }
+    m_condition_variable.notify_one();
 }
 
 template<size_t PARAMETER_SIZE>
@@ -173,13 +163,13 @@ void
 Queue<PARAMETER_SIZE>::get(Request<PARAMETER_SIZE>& request)
 {
     std::unique_lock<std::mutex> lock(m_mutex);
+
     while(true) {
         if(m_queue.empty()) {
-            m_cv.wait(lock);
+            m_condition_variable.wait(lock);
         } else {
             request = m_queue.front();
             m_queue.pop();
-            lock.unlock();
             return;
         }
     }
@@ -192,6 +182,21 @@ Queue<PARAMETER_SIZE>::is_empty() const
     std::unique_lock<std::mutex> lock(m_mutex);
     return m_queue.empty();
 }
+
+template<size_t PARAMETER_SIZE>
+bool
+Queue<PARAMETER_SIZE>::check_for_message_loss() const
+{
+    if(m_queue.size() >= m_max_elements) {
+        std::cerr << "Message loss in '" << m_queue_name << "' - queue is full, " << m_max_elements
+                  << " elements are allowed" << std::endl;
+
+        return true;
+    }
+
+    return false;
+}
+
 } // namespace taste
 
 #endif
