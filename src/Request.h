@@ -107,7 +107,7 @@ struct Request final
 
     /**
      * @brief set the sender pid
-     * 
+     *
      * @param sender_pid    sender pid
      */
     void set_sender_pid(asn1SccPID sender_pid);
@@ -187,8 +187,8 @@ void
 Request<PARAMETER_SIZE>::check_length(size_t length) const
 {
     if(length > PARAMETER_SIZE) {
-        std::cerr << "Request data size shall be <= " << PARAMETER_SIZE << " - new length value ("
-                  << length << ") is greater than " << PARAMETER_SIZE << std::endl;
+        std::cerr << "Request data size shall be <= " << PARAMETER_SIZE << " - new length value (" << length
+                  << ") is greater than " << PARAMETER_SIZE << std::endl;
 
         exit(EXIT_FAILURE);
     }
