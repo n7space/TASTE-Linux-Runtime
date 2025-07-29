@@ -137,7 +137,7 @@ Queue<PARAMETER_SIZE>::put(const Request<PARAMETER_SIZE>& request)
 
         m_queue.push(request);
     }
-    
+
     m_condition_variable.notify_one();
 }
 
