@@ -7,12 +7,14 @@ target_sources(LinuxRuntime
                Thread.h
                Timer.h
                StartBarrier.h
+               HalInternal.h
                Hal.h
   PUBLIC       Lock.cc
                Thread.cc
                BrokerLock.cc
                Timer.cc
                StartBarrier.cc
+               HalInternal.cc
                Hal.cc)
 
 add_format_target(LinuxRuntime)

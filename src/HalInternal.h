@@ -20,27 +20,37 @@
  * limitations under the License.
  */
 
-#ifndef HAL_H
-#define HAL_H
+#ifndef TASTE_HAL_INTERNAL_H
+#define TASTE_HAL_INTERNAL_H
 
 /**
  * @file    Hal.h
  * @brief   Header for Hal
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdlib.h>
+#include <cstdbool>
+#include <cstdint>
+#include <cstdlib>
+#include <mutex>
 
-extern "C"
+#ifndef RT_MAX_HAL_SEMAPHORES
+#define RT_MAX_HAL_SEMAPHORES 8
+#endif
+
+namespace taste {
+
+class Hal final
 {
+  public:
+    Hal() = default;
+
     /**
      * @brief               Initializes the Hal module.
      *
      * @return              Bool indicating whether the initialization was
      *                      successful
      */
-    bool Hal_Init(void);
+    static bool init();
 
     /**
      * @brief               Returns time elapsed from the initialization of the
@@ -48,7 +58,7 @@ extern "C"
      *
      * @return              Time elapsed from the initialization of the runtime
      */
-    uint64_t Hal_GetElapsedTimeInNs(void);
+    static uint64_t getElapsedTimeInNs();
 
     /**
      * @brief               Suspends the current thread for the given amount of time
@@ -57,7 +67,7 @@ extern "C"
      *
      * @return              Bool indicating whether the sleep was successful
      */
-    bool Hal_SleepNs(uint64_t time_ns);
+    static bool sleepNs(uint64_t time_ns);
 
     /**
      * @brief               Creates an RTOS backed semaphore. This function is not
@@ -66,7 +76,7 @@ extern "C"
      *
      * @return              ID of the created semaphore
      */
-    int32_t Hal_SemaphoreCreate(void);
+    static int32_t semaphoreCreate(void);
 
     /**
      * @brief               Obtains the indicated semaphore, suspending the
@@ -76,7 +86,7 @@ extern "C"
      *
      * @return              Bool indicating whether the obtain was successful
      */
-    bool Hal_SemaphoreObtain(int32_t id);
+    static bool semaphoreObtain(int32_t id);
 
     /**
      * @brief               Releases the indicated semaphore, potentially resuming
@@ -86,7 +96,14 @@ extern "C"
      *
      * @return              Bool indicating whether the release was successful
      */
-    bool Hal_SemaphoreRelease(int32_t id);
-}
+    static bool semaphoreRelease(int32_t id);
+
+  private:
+    static std::chrono::steady_clock::time_point m_init_time_stamp;
+
+    static uint32_t m_created_semaphores_count;
+    static std::mutex m_semaphores[RT_MAX_HAL_SEMAPHORES];
+};
+} // namespace taste
 
 #endif

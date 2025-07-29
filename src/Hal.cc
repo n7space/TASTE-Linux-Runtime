@@ -21,102 +21,19 @@
  */
 
 #include "Hal.h"
+#include "HalInternal.h"
 
-#include <chrono>
-#include <thread>
-#include <random>
-#include <limits.h>
-
-namespace taste {
-
-bool
-Hal::init()
+extern "C"
 {
-    srand(time(0));
-    m_init_time_stamp = std::chrono::steady_clock::now();
-    m_created_semaphores_count = 0;
+    bool Hal_Init(void) { return taste::Hal::init(); }
 
-    return true;
+    uint64_t Hal_GetElapsedTimeInNs(void) { return taste::Hal::getElapsedTimeInNs(); }
+
+    bool Hal_SleepNs(uint64_t time_ns) { return taste::Hal::sleepNs(time_ns); }
+
+    int32_t Hal_SemaphoreCreate(void) { return taste::Hal::semaphoreCreate(); }
+
+    bool Hal_SemaphoreObtain(int32_t id) { return taste::Hal::semaphoreObtain(id); }
+
+    bool Hal_SemaphoreRelease(int32_t id) { return taste::Hal::semaphoreRelease(id); }
 }
-
-uint64_t
-Hal::getElapsedTimeInNs(void)
-{
-    std::chrono::steady_clock::time_point now_time_stamp = std::chrono::steady_clock::now();
-
-    auto elapsed_time =
-            std::chrono::duration_cast<std::chrono::nanoseconds>(now_time_stamp - m_init_time_stamp).count();
-
-    if(elapsed_time > 0) {
-        return (uint64_t)elapsed_time;
-    } else {
-        return 0;
-    }
-}
-
-bool
-Hal::sleepNs(uint64_t time_ns)
-{
-    std::this_thread::sleep_for(std::chrono::nanoseconds(time_ns));
-    return true;
-}
-
-int32_t
-Hal::semaphoreCreate(void)
-{
-    if(m_created_semaphores_count >= RT_MAX_HAL_SEMAPHORES) {
-        return 0;
-    }
-
-    int32_t id = (rand() + 1) % INT_MAX;
-    m_semaphores[m_created_semaphores_count++].m_id = id;
-
-    return id;
-}
-
-bool
-Hal::semaphoreObtain(int32_t id)
-{
-    uint32_t index;
-    bool semapore_found = getSemaphoreIndex(id, index);
-
-    if(!semapore_found) {
-        return false;
-    }
-
-    m_semaphores[index].m_mutex.lock();
-
-    return true;
-}
-
-bool
-Hal::semaphoreRelease(int32_t id)
-{
-    uint32_t index;
-    bool semapore_found = getSemaphoreIndex(id, index);
-
-    if(!semapore_found) {
-        return false;
-    }
-
-    m_semaphores[index].m_mutex.unlock();
-
-    return true;
-}
-
-bool
-Hal::getSemaphoreIndex(int32_t id, uint32_t& index)
-{
-    bool semapore_found = false;
-
-    for(index = 0; index < m_created_semaphores_count; index++) {
-        if(m_semaphores[index].m_id == id) {
-            semapore_found = true;
-            break;
-        }
-    }
-
-    return semapore_found;
-}
-
-} // namespace taste
