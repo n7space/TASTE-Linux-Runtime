@@ -28,6 +28,10 @@
 
 namespace taste {
 
+std::chrono::steady_clock::time_point Hal::m_init_time_stamp;
+uint32_t Hal::m_created_semaphores_count;
+std::mutex Hal::m_semaphores[RT_MAX_HAL_SEMAPHORES];
+
 bool
 Hal::init()
 {
