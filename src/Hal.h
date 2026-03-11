@@ -32,8 +32,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
 extern "C"
 {
+#endif
     /**
      * @brief               Initializes the Hal module.
      *
@@ -87,6 +89,8 @@ extern "C"
      * @return              Bool indicating whether the release was successful
      */
     bool Hal_SemaphoreRelease(int32_t id);
+#ifdef __cplusplus
 }
+#endif
 
 #endif
