@@ -134,8 +134,13 @@ Request<PARAMETER_SIZE>::Request(const asn1SccPID sender_pid, const uint8_t* con
     , m_sender_pid(sender_pid)
 {
     check_length(length);
-
-    memcpy(m_data.data(), data, length);
+    if (length > 0)
+    {
+        // If length is 0, there is nothing to copy, and data may be null_ptr
+        // This case may occur if the underlying ASN.1 data type requires 0 bytes for encoding,
+        // e.g., when only a single value is allowed.
+        memcpy(m_data.data(), data, length);
+    }
 }
 
 template<size_t PARAMETER_SIZE>
